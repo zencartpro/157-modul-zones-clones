@@ -1,0 +1,15 @@
+Zusätzliche Versandkosten nach Zonen Module 1.0.1 für Zen Cart Version 1.5.7 deutsch
+
+Mit dieser Erweiterung können via Shopadministration weitere Versandkosten nach Zonen Module für verschiedene Versanddienstleister verwendet werden.
+
+Installation:
+
+1)
+Den Inhalt des Ordners NEUE DATEIEN in der vorgegebenen Struktur hochladen, es werden dabei keine bestehenden Dateien überschrieben.
+
+2)
+Im Administrations-Bereich die neuen Versandmodule aktivieren und konfigurieren
+
+In den Sprachdateien wie gewünscht anpassen, z.B.
+define('MODULE_SHIPPING_ZONES2_TEXT_TITLE','Versand per DPD');
+define('MODULE_SHIPPING_ZONES3_TEXT_TITLE','Versand per GLS');
