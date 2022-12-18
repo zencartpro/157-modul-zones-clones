@@ -1,4 +1,4 @@
-Zusätzliche Versandkosten nach Zonen Module 1.0.1 für Zen Cart Version 1.5.7 deutsch
+Zusätzliche Versandkosten nach Zonen Module 1.0.2 für Zen Cart Version 1.5.7 deutsch
 
 Mit dieser Erweiterung können via Shopadministration weitere Versandkosten nach Zonen Module für verschiedene Versanddienstleister verwendet werden.
 
