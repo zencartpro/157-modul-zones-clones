@@ -2,11 +2,11 @@
 /**
  * Zen Cart German Specific (158 code in 157 / zencartpro adaptations)
 
- * @copyright Copyright 2003-2022 Zen Cart Development Team
+ * @copyright Copyright 2003-2023 Zen Cart Development Team
  * Zen Cart German Version - www.zen-cart-pro.at
  * @copyright Portions Copyright 2003 osCommerce
  * @license https://www.zen-cart-pro.at/license/3_0.txt GNU General Public License V3.0
- * @version $Id: zones3.php 2022-12-18 19:03:16Z webchills $
+ * @version $Id: zones3.php 2023-11-19 09:03:16Z webchills $
  */
 /*
 
@@ -125,7 +125,7 @@
      * $num_zones is the number of zones to process
      * @var integer
      */
-    protected $num_zones;
+    protected $num_zones3;
     /** 
      * $quotes is an array containing all the quote information for this shipping module
      * @var array
@@ -234,7 +234,7 @@
           switch (MODULE_SHIPPING_ZONES3_METHOD) {
         	  case (MODULE_SHIPPING_ZONES3_METHOD == 'Weight'):
               if (round($shipping_weight,9) <= $zones3_table[$i]) {
-                $shipping = $zones3_table[$i+1];
+                
 
                 switch (SHIPPING_BOX_WEIGHT_DISPLAY) {
                 case (0):
@@ -244,10 +244,10 @@
                   $show_box_weight = ' (' . $shipping_num_boxes . ' ' . TEXT_SHIPPING_BOXES . ')';
                   break;
                 case (2):
-                  $show_box_weight = ' (' . number_format($shipping_weight * $shipping_num_boxes,2) . MODULE_SHIPPING_ZONES3_TEXT_UNITS . ')';
+                  $show_box_weight = ' (' . number_format($shipping_weight * $shipping_num_boxes,2) . TEXT_SHIPPING_WEIGHT . ')';
                   break;
                 default:
-                  $show_box_weight = ' (' . $shipping_num_boxes . ' x ' . number_format($shipping_weight,2) . MODULE_SHIPPING_ZONES3_TEXT_UNITS . ')';
+                  $show_box_weight = ' (' . $shipping_num_boxes . ' x ' . number_format($shipping_weight,2) . TEXT_SHIPPING_WEIGHT . ')';
                   break;
                 }
 
@@ -264,7 +264,7 @@
         	  case (MODULE_SHIPPING_ZONES3_METHOD == 'Price'):
 // shipping adjustment
               if (($_SESSION['cart']->show_total() - $_SESSION['cart']->free_shipping_prices()) <= $zones3_table[$i]) {
-                $shipping = $zones3_table[$i+1];
+               
                 $shipping_method = MODULE_SHIPPING_ZONES3_TEXT_WAY . ' ' . $dest_country;
         if (strstr($zones3_table[$i+1], '%')) {
           $shipping = ($zones3_table[$i+1]/100) * $order_total_amount;
@@ -278,7 +278,7 @@
         	  case (MODULE_SHIPPING_ZONES3_METHOD == 'Item'):
 // shipping adjustment
               if (($total_count - $_SESSION['cart']->free_shipping_items()) <= $zones3_table[$i]) {
-                $shipping = $zones3_table[$i+1];
+               
                 $shipping_method = MODULE_SHIPPING_ZONES3_TEXT_WAY . ' ' . $dest_country;
                 $done = true;
         if (strstr($zones3_table[$i+1], '%')) {
@@ -320,11 +320,15 @@
           }
         }
       }
-      $this->quotes = array('id' => $this->code,
-                            'module' => MODULE_SHIPPING_ZONES3_TEXT_TITLE,
-                            'methods' => array(array('id' => $this->code,
-                                                     'title' => $shipping_method,
-                                                     'cost' => $shipping_cost)));
+    $this->quotes = array(
+      'id' => $this->code,
+      'module' => MODULE_SHIPPING_ZONES3_TEXT_TITLE,
+      'methods' => array(array(
+        'id' => $this->code,
+        'title' => $shipping_method,
+        'cost' => $shipping_cost
+      ))
+    );
 
       if ($this->tax_class > 0) {
         $this->quotes['tax'] = zen_get_tax_rate($this->tax_class, $order->delivery['country']['id'], $order->delivery['zone_id']);
@@ -363,23 +367,23 @@
       $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Versandkosten nach Zonen aktivieren?', 'MODULE_SHIPPING_ZONES3_STATUS', '43', 'Wollen Sie Versandkosten nach Zonen aktivieren?', now())");
       $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Berechnungsweise', 'MODULE_SHIPPING_ZONES3_METHOD', '43', 'Sollen die Kosten nach Gewicht (Weight), Preis (Price) oder pro Stück (Item) berechnet werden?', now())");
       $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Steuerklasse', 'MODULE_SHIPPING_ZONES3_TAX_CLASS', '43', 'Folgende Steuerklasse auf die Versandkosten anwenden:', now())");
-      $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Basis der Steuern', 'MODULE_SHIPPING_ZONES3_TAX_BASIS', '43', 'Auf welcher Basis soll die Steuer für die Versandkosten berechnet werden. Mögliche Optionen:<br/>Shipping - basiert auf der Versandadresse des Kunden<br/>Billing - basiert auf der Rechnungsadresse des Kunden<br/>Store - basiert auf der Adresse des Shops falls Zone für Rechnung/Versand gleich der Zone des Shops ist.', now())");
+      $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Basis der Steuern', 'MODULE_SHIPPING_ZONES3_TAX_BASIS', '43', 'Auf welcher Basis soll die Steuer für die Versandkosten berechnet werden. Mögliche Optionen:<br>Shipping - basiert auf der Versandadresse des Kunden<br>Billing - basiert auf der Rechnungsadresse des Kunden<br>Store - basiert auf der Adresse des Shops falls Zone für Rechnung/Versand gleich der Zone des Shops ist.', now())");
       $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Sortierreihenfolge', 'MODULE_SHIPPING_ZONES3_SORT_ORDER', '43', 'Anzeigereihenfolge. Niedrigste Werte werden zuerst angezeigt.', now())");
-      $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Länder ausschliessen', 'MODULE_SHIPPING_ZONES3_SKIPPED', '43', 'Tragen Sie hier nur die Länder ein, für die Sie Versandkosten nach Zonen NICHT anbieten wollen. Einzugeben mit den zweistelligen ISO Ländercodes durch Komma getrennt. z.B. US,DE,CH<br/>Wenn Sie keine bestimmten Länder ausschliessen wollen, lassen Sie dieses Feld leer!', now())");
-      $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Zone 1 Länder', 'MODULE_SHIPPING_ZONES3_COUNTRIES_1', '43', 'Tragen Sie hier die Länder für Ihre Zone 1 ein. Einzugeben sind die zweistelligen ISO Ländercodes durch Komma getrennt, z.B. DE,CH,AT<br/>Tragen Sie 00 ein, wenn die Zone für alle ISO Ländercodes gelten soll', now())");
-      $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Zone 2 Länder', 'MODULE_SHIPPING_ZONES3_COUNTRIES_2', '43', 'Tragen Sie hier die Länder für Ihre Zone 2 ein. Einzugeben sind die zweistelligen ISO Ländercodes durch Komma getrennt, z.B. DE,CH,AT<br/>Tragen Sie 00 ein, wenn die Zone für alle ISO Ländercodes gelten soll', now())");
-      $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Zone 3 Länder', 'MODULE_SHIPPING_ZONES3_COUNTRIES_3', '43', 'Tragen Sie hier die Länder für Ihre Zone 3 ein. Einzugeben sind die zweistelligen ISO Ländercodes durch Komma getrennt, z.B. DE,CH,AT<br/>Tragen Sie 00 ein, wenn die Zone für alle ISO Ländercodes gelten soll', now())");
-      $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Zone 4 Länder', 'MODULE_SHIPPING_ZONES3_COUNTRIES_4', '43', 'Tragen Sie hier die Länder für Ihre Zone 4 ein. Einzugeben sind die zweistelligen ISO Ländercodes durch Komma getrennt, z.B. DE,CH,AT<br/>Tragen Sie 00 ein, wenn die Zone für alle ISO Ländercodes gelten soll', now())");
-      $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Zone 5 Länder', 'MODULE_SHIPPING_ZONES3_COUNTRIES_5', '43', 'Tragen Sie hier die Länder für Ihre Zone 5 ein. Einzugeben sind die zweistelligen ISO Ländercodes durch Komma getrennt, z.B. DE,CH,AT<br/>Tragen Sie 00 ein, wenn die Zone für alle ISO Ländercodes gelten soll', now())");
-      $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Zone 6 Länder', 'MODULE_SHIPPING_ZONES3_COUNTRIES_6', '43', 'Tragen Sie hier die Länder für Ihre Zone 6 ein. Einzugeben sind die zweistelligen ISO Ländercodes durch Komma getrennt, z.B. DE,CH,AT<br/>Tragen Sie 00 ein, wenn die Zone für alle ISO Ländercodes gelten soll', now())");
-      $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Zone 7 Länder', 'MODULE_SHIPPING_ZONES3_COUNTRIES_7', '43', 'Tragen Sie hier die Länder für Ihre Zone 7 ein. Einzugeben sind die zweistelligen ISO Ländercodes durch Komma getrennt, z.B. DE,CH,AT<br/>Tragen Sie 00 ein, wenn die Zone für alle ISO Ländercodes gelten soll', now())");
-      $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Zone 1 Versandkosten', 'MODULE_SHIPPING_ZONES3_COST_1', '43', 'Versandkosten für die Länder der Zone 1<br/>Beispiel: 3:8.50,7:10.50,99:20.00<br/>Bedeutet: Gewicht/Preis kleiner oder gleich 3 kostet 8.50. Zwischen 3 und 7 kostet der Versand 10.50 usw.<br/>Sie können auch einen Prozentsatz der Bestellsumme als Versandkosten verwenden und z.B. definieren:<br/>25:8.50,35:5%,40:9.50,10000:7%', now())");
-      $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Zone 2 Versandkosten', 'MODULE_SHIPPING_ZONES3_COST_2', '43', 'Versandkosten für die Länder der Zone 2<br/>Beispiel: 3:8.50,7:10.50,99:20.00<br/>Bedeutet: Gewicht/Preis kleiner oder gleich 3 kostet 8.50. Zwischen 3 und 7 kostet der Versand 10.50 usw.<br/>Sie können auch einen Prozentsatz der Bestellsumme als Versandkosten verwenden und z.B. definieren:<br/>25:8.50,35:5%,40:9.50,10000:7%', now())");
-      $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Zone 3 Versandkosten', 'MODULE_SHIPPING_ZONES3_COST_3', '43', 'Versandkosten für die Länder der Zone 3<br/>Beispiel: 3:8.50,7:10.50,99:20.00<br/>Bedeutet: Gewicht/Preis kleiner oder gleich 3 kostet 8.50. Zwischen 3 und 7 kostet der Versand 10.50 usw.<br/>Sie können auch einen Prozentsatz der Bestellsumme als Versandkosten verwenden und z.B. definieren:<br/>25:8.50,35:5%,40:9.50,10000:7%', now())");
-      $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Zone 4 Versandkosten', 'MODULE_SHIPPING_ZONES3_COST_4', '43', 'Versandkosten für die Länder der Zone 4<br/>Beispiel: 3:8.50,7:10.50,99:20.00<br/>Bedeutet: Gewicht/Preis kleiner oder gleich 3 kostet 8.50. Zwischen 3 und 7 kostet der Versand 10.50 usw.<br/>Sie können auch einen Prozentsatz der Bestellsumme als Versandkosten verwenden und z.B. definieren:<br/>25:8.50,35:5%,40:9.50,10000:7%', now())");
-      $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Zone 5 Versandkosten', 'MODULE_SHIPPING_ZONES3_COST_5', '43', 'Versandkosten für die Länder der Zone 5<br/>Beispiel: 3:8.50,7:10.50,99:20.00<br/>Bedeutet: Gewicht/Preis kleiner oder gleich 3 kostet 8.50. Zwischen 3 und 7 kostet der Versand 10.50 usw.<br/>Sie können auch einen Prozentsatz der Bestellsumme als Versandkosten verwenden und z.B. definieren:<br/>25:8.50,35:5%,40:9.50,10000:7%', now())");
-      $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Zone 6 Versandkosten', 'MODULE_SHIPPING_ZONES3_COST_6', '43', 'Versandkosten für die Länder der Zone 6<br/>Beispiel: 3:8.50,7:10.50,99:20.00<br/>Bedeutet: Gewicht/Preis kleiner oder gleich 3 kostet 8.50. Zwischen 3 und 7 kostet der Versand 10.50 usw.<br/>Sie können auch einen Prozentsatz der Bestellsumme als Versandkosten verwenden und z.B. definieren:<br/>25:8.50,35:5%,40:9.50,10000:7%', now())");
-      $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Zone 7 Versandkosten', 'MODULE_SHIPPING_ZONES3_COST_7', '43', 'Versandkosten für die Länder der Zone 7<br/>Beispiel: 3:8.50,7:10.50,99:20.00<br/>Bedeutet: Gewicht/Preis kleiner oder gleich 3 kostet 8.50. Zwischen 3 und 7 kostet der Versand 10.50 usw.<br/>Sie können auch einen Prozentsatz der Bestellsumme als Versandkosten verwenden und z.B. definieren:<br/>25:8.50,35:5%,40:9.50,10000:7%', now())");
+      $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Länder ausschliessen', 'MODULE_SHIPPING_ZONES3_SKIPPED', '43', 'Tragen Sie hier nur die Länder ein, für die Sie Versandkosten nach Zonen NICHT anbieten wollen. Einzugeben mit den zweistelligen ISO Ländercodes durch Komma getrennt. z.B. US,DE,CH<br>Wenn Sie keine bestimmten Länder ausschliessen wollen, lassen Sie dieses Feld leer!', now())");
+      $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Zone 1 Länder', 'MODULE_SHIPPING_ZONES3_COUNTRIES_1', '43', 'Tragen Sie hier die Länder für Ihre Zone 1 ein. Einzugeben sind die zweistelligen ISO Ländercodes durch Komma getrennt, z.B. DE,CH,AT<br>Tragen Sie 00 ein, wenn die Zone für alle ISO Ländercodes gelten soll', now())");
+      $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Zone 2 Länder', 'MODULE_SHIPPING_ZONES3_COUNTRIES_2', '43', 'Tragen Sie hier die Länder für Ihre Zone 2 ein. Einzugeben sind die zweistelligen ISO Ländercodes durch Komma getrennt, z.B. DE,CH,AT<br>Tragen Sie 00 ein, wenn die Zone für alle ISO Ländercodes gelten soll', now())");
+      $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Zone 3 Länder', 'MODULE_SHIPPING_ZONES3_COUNTRIES_3', '43', 'Tragen Sie hier die Länder für Ihre Zone 3 ein. Einzugeben sind die zweistelligen ISO Ländercodes durch Komma getrennt, z.B. DE,CH,AT<br>Tragen Sie 00 ein, wenn die Zone für alle ISO Ländercodes gelten soll', now())");
+      $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Zone 4 Länder', 'MODULE_SHIPPING_ZONES3_COUNTRIES_4', '43', 'Tragen Sie hier die Länder für Ihre Zone 4 ein. Einzugeben sind die zweistelligen ISO Ländercodes durch Komma getrennt, z.B. DE,CH,AT<br>Tragen Sie 00 ein, wenn die Zone für alle ISO Ländercodes gelten soll', now())");
+      $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Zone 5 Länder', 'MODULE_SHIPPING_ZONES3_COUNTRIES_5', '43', 'Tragen Sie hier die Länder für Ihre Zone 5 ein. Einzugeben sind die zweistelligen ISO Ländercodes durch Komma getrennt, z.B. DE,CH,AT<br>Tragen Sie 00 ein, wenn die Zone für alle ISO Ländercodes gelten soll', now())");
+      $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Zone 6 Länder', 'MODULE_SHIPPING_ZONES3_COUNTRIES_6', '43', 'Tragen Sie hier die Länder für Ihre Zone 6 ein. Einzugeben sind die zweistelligen ISO Ländercodes durch Komma getrennt, z.B. DE,CH,AT<br>Tragen Sie 00 ein, wenn die Zone für alle ISO Ländercodes gelten soll', now())");
+      $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Zone 7 Länder', 'MODULE_SHIPPING_ZONES3_COUNTRIES_7', '43', 'Tragen Sie hier die Länder für Ihre Zone 7 ein. Einzugeben sind die zweistelligen ISO Ländercodes durch Komma getrennt, z.B. DE,CH,AT<br>Tragen Sie 00 ein, wenn die Zone für alle ISO Ländercodes gelten soll', now())");
+      $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Zone 1 Versandkosten', 'MODULE_SHIPPING_ZONES3_COST_1', '43', 'Versandkosten für die Länder der Zone 1<br>Beispiel: 3:8.50,7:10.50,99:20.00<br>Bedeutet: Gewicht/Preis kleiner oder gleich 3 kostet 8.50. Zwischen 3 und 7 kostet der Versand 10.50 usw.<br>Sie können auch einen Prozentsatz der Bestellsumme als Versandkosten verwenden und z.B. definieren:<br>25:8.50,35:5%,40:9.50,10000:7%', now())");
+      $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Zone 2 Versandkosten', 'MODULE_SHIPPING_ZONES3_COST_2', '43', 'Versandkosten für die Länder der Zone 2<br>Beispiel: 3:8.50,7:10.50,99:20.00<br>Bedeutet: Gewicht/Preis kleiner oder gleich 3 kostet 8.50. Zwischen 3 und 7 kostet der Versand 10.50 usw.<br>Sie können auch einen Prozentsatz der Bestellsumme als Versandkosten verwenden und z.B. definieren:<br>25:8.50,35:5%,40:9.50,10000:7%', now())");
+      $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Zone 3 Versandkosten', 'MODULE_SHIPPING_ZONES3_COST_3', '43', 'Versandkosten für die Länder der Zone 3<br>Beispiel: 3:8.50,7:10.50,99:20.00<br>Bedeutet: Gewicht/Preis kleiner oder gleich 3 kostet 8.50. Zwischen 3 und 7 kostet der Versand 10.50 usw.<br>Sie können auch einen Prozentsatz der Bestellsumme als Versandkosten verwenden und z.B. definieren:<br>25:8.50,35:5%,40:9.50,10000:7%', now())");
+      $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Zone 4 Versandkosten', 'MODULE_SHIPPING_ZONES3_COST_4', '43', 'Versandkosten für die Länder der Zone 4<br>Beispiel: 3:8.50,7:10.50,99:20.00<br>Bedeutet: Gewicht/Preis kleiner oder gleich 3 kostet 8.50. Zwischen 3 und 7 kostet der Versand 10.50 usw.<br>Sie können auch einen Prozentsatz der Bestellsumme als Versandkosten verwenden und z.B. definieren:<br>25:8.50,35:5%,40:9.50,10000:7%', now())");
+      $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Zone 5 Versandkosten', 'MODULE_SHIPPING_ZONES3_COST_5', '43', 'Versandkosten für die Länder der Zone 5<br>Beispiel: 3:8.50,7:10.50,99:20.00<br>Bedeutet: Gewicht/Preis kleiner oder gleich 3 kostet 8.50. Zwischen 3 und 7 kostet der Versand 10.50 usw.<br>Sie können auch einen Prozentsatz der Bestellsumme als Versandkosten verwenden und z.B. definieren:<br>25:8.50,35:5%,40:9.50,10000:7%', now())");
+      $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Zone 6 Versandkosten', 'MODULE_SHIPPING_ZONES3_COST_6', '43', 'Versandkosten für die Länder der Zone 6<br>Beispiel: 3:8.50,7:10.50,99:20.00<br>Bedeutet: Gewicht/Preis kleiner oder gleich 3 kostet 8.50. Zwischen 3 und 7 kostet der Versand 10.50 usw.<br>Sie können auch einen Prozentsatz der Bestellsumme als Versandkosten verwenden und z.B. definieren:<br>25:8.50,35:5%,40:9.50,10000:7%', now())");
+      $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Zone 7 Versandkosten', 'MODULE_SHIPPING_ZONES3_COST_7', '43', 'Versandkosten für die Länder der Zone 7<br>Beispiel: 3:8.50,7:10.50,99:20.00<br>Bedeutet: Gewicht/Preis kleiner oder gleich 3 kostet 8.50. Zwischen 3 und 7 kostet der Versand 10.50 usw.<br>Sie können auch einen Prozentsatz der Bestellsumme als Versandkosten verwenden und z.B. definieren:<br>25:8.50,35:5%,40:9.50,10000:7%', now())");
       $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Zone 1 Bearbeitungsgebühr', 'MODULE_SHIPPING_ZONES3_HANDLING_1', '43', 'Wenn Sie in dieser Zone eine Bearbeitungsgebühr verrechnen wollen, hier eintragen. Falls nicht, die Null lassen.', now())");
       $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Zone 2 Bearbeitungsgebühr', 'MODULE_SHIPPING_ZONES3_HANDLING_2', '43', 'Wenn Sie in dieser Zone eine Bearbeitungsgebühr verrechnen wollen, hier eintragen. Falls nicht, die Null lassen.', now())");
       $db->Execute("insert into " . TABLE_CONFIGURATION_LANGUAGE   . " (configuration_title, configuration_key, configuration_language_id, configuration_description, date_added) values ('Zone 3 Bearbeitungsgebühr', 'MODULE_SHIPPING_ZONES3_HANDLING_3', '43', 'Wenn Sie in dieser Zone eine Bearbeitungsgebühr verrechnen wollen, hier eintragen. Falls nicht, die Null lassen.', now())");
@@ -410,8 +414,8 @@
 
     function remove() {
       global $db;
-      $db->Execute("delete from " . TABLE_CONFIGURATION . " where configuration_key like 'MODULE\_SHIPPING\_ZONES\_%'");
-      $db->Execute("delete from " . TABLE_CONFIGURATION_LANGUAGE . " where configuration_key like 'MODULE\_SHIPPING\_ZONES\_%'");
+      $db->Execute("delete from " . TABLE_CONFIGURATION . " where configuration_key like 'MODULE\_SHIPPING\_ZONES3\_%'");
+      $db->Execute("delete from " . TABLE_CONFIGURATION_LANGUAGE . " where configuration_key like 'MODULE\_SHIPPING\_ZONES3\_%'");
     }
 
     function keys() {
